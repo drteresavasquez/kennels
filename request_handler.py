@@ -129,8 +129,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             new_entity = create_animal(post_body)
         if resource == "locations":
             new_entity = create_location(post_body)
-        if resource == "customers":
-            new_entity = create_customer(post_body)
+        # if resource == "customers":
+        #     new_entity = create_customer(post_body)
         if resource == "employees":
             new_entity = create_employee(post_body)
 
@@ -154,8 +154,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             update_animal(id, post_body)
         if resource == "locations":
             update_location(id, post_body)
-        if resource == "customers":
-            update_customer(id, post_body)
+        # if resource == "customers":
+        #     update_customer(id, post_body)
         if resource == "employees":
             update_employee(id, post_body)
         # Encode the new animal and send in response
@@ -174,8 +174,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             delete_animal(id)
         if resource == "locations":
             delete_location(id)
-        if resource == "customers":
-            delete_customer(id)
+        # if resource == "customers":
+        #     delete_customer(id)
         if resource == "employees":
             delete_employee(id)
         # Encode the new animal and send in response
