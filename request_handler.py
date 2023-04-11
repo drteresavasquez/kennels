@@ -108,7 +108,13 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_customer_by_email(query['email'][0])
             # see if the query dictionary has an location_id key
             if query.get('location_id') and resource == 'animals':
-                response = get_animal_by_location_id(query['location_id'][0])
+                response = get_animals_by_location_id(query['location_id'][0])
+            # see if the query dictionary has an location_id key
+            if query.get('location_id') and resource == 'employees':
+                response = get_employees_by_location_id(query['location_id'][0])
+            # see if the query dictionary has an location_id key
+            if query.get('status') and resource == 'animals':
+                response = get_animals_by_status(query['status'][0])
 
         # This weird code sends a response back to the client
         # self.wfile.write(f"{response}".encode())
@@ -180,12 +186,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Delete a single animal from the list
         if resource == "animals":
             delete_animal(id)
-        if resource == "locations":
-            delete_location(id)
+        # if resource == "locations":
+        #     delete_location(id)
         # if resource == "customers":
         #     delete_customer(id)
-        if resource == "employees":
-            delete_employee(id)
+        # if resource == "employees":
+        #     delete_employee(id)
         # Encode the new animal and send in response
         self.wfile.write("".encode())
 
