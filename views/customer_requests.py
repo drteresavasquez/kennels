@@ -61,6 +61,8 @@ def get_single_customer(id):
         # Create an customer instance from the current row
         customer = Customer(data['id'], data['name'], data['address'])
 
+        # TODO: you will get an error about the address on customer. Look through the customer model and requests to see if you can solve the issue.
+        
         return customer.__dict__
     
 def get_customer_by_email(email):
