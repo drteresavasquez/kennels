@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from urllib.parse import urlparse, parse_qs
 from views import *
 
 # Here's a class. It inherits from another class.
@@ -11,29 +12,23 @@ class HandleRequests(BaseHTTPRequestHandler):
     # It gives a description of the class or function
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
+    # replace the parse_url function in the class
     def parse_url(self, path):
-        """Gets the id param from the URL
-        """
-
-        # Just like splitting a string in JavaScript. If the
-        # path is "/animals/1", the resulting list will
-        # have "" at index 0, "animals" at index 1, and "1"
-        # at index 2.
-        path_params = path.split("/")
+        """Parse the url into the resource and id"""
+        parsed_url = urlparse(path)
+        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
         resource = path_params[1]
-        id = None
 
-        # Try to get the item at index 2
+        if parsed_url.query:
+            query = parse_qs(parsed_url.query)
+            return (resource, query)
+
+        pk = None
         try:
-            # Convert the string "1" to the integer 1
-            # This is the new parseInt()
-            id = int(path_params[2])
-        except IndexError:
-            pass  # No route parameter exists: /animals
-        except ValueError:
-            pass  # Request had trailing slash: /animals/
-
-        return (resource, id)  # This is a tuple
+            pk = int(path_params[2])
+        except (IndexError, ValueError):
+            pass
+        return (resource, pk)
 
     # Here's a class function
     def _set_headers(self, status):
@@ -73,34 +68,44 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Your new console.log() that outputs to the terminal
         # print(self.path)
 
-        (resource, id) = self.parse_url(self.path)
+        parsed = self.parse_url(self.path)
 
-        # It's an if..else statement
-        if resource == "animals":
-            if id is not None:
-                response = get_single_animal(id)
+        if '?' not in self.path:
+            ( resource, id ) = parsed
+                  
+            # It's an if..else statement
+            if resource == "animals":
+                if id is not None:
+                    response = get_single_animal(id)
 
-            else:
-                response = get_all_animals()
+                else:
+                    response = get_all_animals()
 
-        if resource == "locations":
-            if id is not None:
-                response = get_single_location(id)
+            if resource == "locations":
+                if id is not None:
+                    response = get_single_location(id)
 
-            else:
-                response = get_all_locations()
-        if resource == "employees":
-            if id is not None:
-                response = get_single_employee(id)
+                else:
+                    response = get_all_locations()
+            if resource == "employees":
+                if id is not None:
+                    response = get_single_employee(id)
 
-            else:
-                response = get_all_employees()
-        if resource == "customers":
-            if id is not None:
-                response = get_single_customer(id)
+                else:
+                    response = get_all_employees()
+            if resource == "customers":
+                if id is not None:
+                    response = get_single_customer(id)
 
-            else:
-                response = get_all_customers()
+                else:
+                    response = get_all_customers()
+
+        else: # There is a ? in the path, run the query param functions
+            (resource, query) = parsed
+
+            # see if the query dictionary has an email key
+            if query.get('email') and resource == 'customers':
+                response = get_customer_by_email(query['email'][0])
 
         # This weird code sends a response back to the client
         # self.wfile.write(f"{response}".encode())
