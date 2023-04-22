@@ -101,6 +101,9 @@ class HandleRequests(BaseHTTPRequestHandler):
             # see if the query dictionary has an location_id key
             if query.get('status') and resource == 'animals':
                 response = get_animals_by_status(query['status'][0])
+            # see if the query dictionary has an location_id key
+            if query.get('search') and resource == 'animals':
+                response = get_animals_by_search_term(query['search'][0])
 
         # This weird code sends a response back to the client
         # self.wfile.write(f"{response}".encode())
