@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Employee 
+from models import Employee, Location
 
 def get_all_employees():
     # Open a connection to the database
@@ -14,8 +14,14 @@ def get_all_employees():
         db_cursor.execute("""
         SELECT
             e.id,
-            e.name
-        FROM employee e
+            e.name,
+            e.address,
+            e.location_id,
+            l.name location_name,
+            l.address location_address
+        FROM Employee e
+        JOIN Location l
+            ON l.id = e.location_id
         """)
 
         # Initialize an empty list to hold all animal representations
@@ -31,8 +37,9 @@ def get_all_employees():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Animal class above.
-            employee = Employee(row['id'], row['name'])
-
+            employee = Employee(row['id'], row['name'], row['location_id'])
+            location = Location(row['id'], row['location_address'], row['location_name'])
+            employee.location = location.__dict__
             employees.append(employee.__dict__)
 
     return employees
@@ -48,8 +55,14 @@ def get_single_employee(id):
         db_cursor.execute("""
         SELECT
             e.id,
-            e.name
-        FROM employee e
+            e.name,
+            e.address,
+            e.location_id,
+            l.name location_name,
+            l.address location_address
+        FROM Employee e
+        JOIN Location l
+            ON l.id = e.location_id
         WHERE e.id = ?
         """, ( id, ))
 
@@ -57,7 +70,9 @@ def get_single_employee(id):
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
-        employee = Employee(data['id'], data['name'])
+        employee = Employee(data['id'], data['name'], data['location_id'])
+        location = Location(data['id'], data['location_address'], data['location_name'])
+        employee.location = location.__dict__
 
         return employee.__dict__
 
@@ -74,7 +89,8 @@ def get_employees_by_location_id(location_id):
         SELECT
             e.id,
             e.name,
-            e.address
+            e.address,
+            e.location_id
         FROM employee e
         WHERE e.location_id = ?
         """, (location_id, ))
@@ -92,7 +108,7 @@ def get_employees_by_location_id(location_id):
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Animal class above.
-            employee = Employee(row['id'], row['name'], row['address'])
+            employee = Employee(row['id'], row['name'], row['location_id'])
 
             employees.append(employee.__dict__)
 
@@ -108,15 +124,14 @@ def get_employees_by_location_id(location_id):
 
 #     return employee
 
-# def delete_employee(id):
-#     employee_index = -1
+def delete_employee(id):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-#     for index, employee in enumerate(EMPLOYEES):
-#         if employee["id"] == id:
-#             employee_index = index
-
-#     if employee_index >= 0:
-#         EMPLOYEES.pop(employee_index)
+        db_cursor.execute("""
+        DELETE FROM employee
+        WHERE id = ?
+        """, (id, ))
 
 # def update_employee(id, new_employee):
 #     for index, employee in enumerate(EMPLOYEES):

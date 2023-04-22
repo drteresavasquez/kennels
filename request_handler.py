@@ -7,12 +7,15 @@ from views import *
 # For now, think of a class as a container for functions that
 # work together for a common purpose. In this case, that
 # common purpose is to respond to HTTP requests from a client.
+
+
 class HandleRequests(BaseHTTPRequestHandler):
     # This is a Docstring it should be at the beginning of all classes and functions
     # It gives a description of the class or function
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
     # replace the parse_url function in the class
+
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
@@ -71,8 +74,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         parsed = self.parse_url(self.path)
 
         if '?' not in self.path:
-            ( resource, id ) = parsed
-                  
+            (resource, id) = parsed
+
             # It's an if..else statement
             if resource == "animals":
                 if id is not None:
@@ -100,7 +103,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 else:
                     response = get_all_customers()
 
-        else: # There is a ? in the path, run the query param functions
+        else:  # There is a ? in the path, run the query param functions
             (resource, query) = parsed
 
             # see if the query dictionary has an email key
@@ -111,7 +114,8 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_animals_by_location_id(query['location_id'][0])
             # see if the query dictionary has an location_id key
             if query.get('location_id') and resource == 'employees':
-                response = get_employees_by_location_id(query['location_id'][0])
+                response = get_employees_by_location_id(
+                    query['location_id'][0])
             # see if the query dictionary has an location_id key
             if query.get('status') and resource == 'animals':
                 response = get_animals_by_status(query['status'][0])
@@ -141,12 +145,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         # function next.
         if resource == "animals":
             new_entity = create_animal(post_body)
-        if resource == "locations":
-            new_entity = create_location(post_body)
-        # if resource == "customers":
-        #     new_entity = create_customer(post_body)
-        if resource == "employees":
-            new_entity = create_employee(post_body)
+        # if resource == "locations":
+        #     new_entity = create_location(post_body)
+        # # if resource == "customers":
+        # #     new_entity = create_customer(post_body)
+        # if resource == "employees":
+        #     new_entity = create_employee(post_body)
 
         # Encode the new animal and send in response
         self.wfile.write(json.dumps(new_entity).encode())
@@ -163,19 +167,26 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        success = False
+
         # Delete a single animal from the list
         if resource == "animals":
-            update_animal(id, post_body)
-        if resource == "locations":
-            update_location(id, post_body)
-        # if resource == "customers":
-        #     update_customer(id, post_body)
-        if resource == "employees":
-            update_employee(id, post_body)
+            success = update_animal(id, post_body)
+        # if resource == "locations":
+        #     update_location(id, post_body)
+        # # if resource == "customers":
+        # #     update_customer(id, post_body)
+        # if resource == "employees":
+        #     update_employee(id, post_body)
         # Encode the new animal and send in response
+
+        if success:
+            self._set_headers(204)
+        else:
+            self._set_headers(404)
+        
         self.wfile.write("".encode())
 
-    
     def do_DELETE(self):
         # Set a 204 response code
         self._set_headers(204)
@@ -190,8 +201,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         #     delete_location(id)
         # if resource == "customers":
         #     delete_customer(id)
-        # if resource == "employees":
-        #     delete_employee(id)
+        if resource == "employees":
+            delete_employee(id)
         # Encode the new animal and send in response
         self.wfile.write("".encode())
 

@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Location 
+from models import Location
 
 def get_all_locations():
     # Open a connection to the database
@@ -14,7 +14,8 @@ def get_all_locations():
         db_cursor.execute("""
         SELECT
             l.id,
-            l.name
+            l.name,
+            l.address
         FROM location l
         """)
 
@@ -31,7 +32,7 @@ def get_all_locations():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Animal class above.
-            location = Location(row['id'], row['name'])
+            location = Location(row['id'], row['address'], row['name'])
 
             locations.append(location.__dict__)
 
