@@ -1,21 +1,12 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse, parse_qs
-from views import *
-
-# Here's a class. It inherits from another class.
-# For now, think of a class as a container for functions that
-# work together for a common purpose. In this case, that
-# common purpose is to respond to HTTP requests from a client.
-
+from views import (get_all_animals, get_single_animal, get_animals_by_location_id,
+                   get_animals_by_status, delete_animal, update_animal, create_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, get_employees_by_location_id, delete_employee, get_all_customers, get_single_customer, get_customer_by_email)
 
 class HandleRequests(BaseHTTPRequestHandler):
-    # This is a Docstring it should be at the beginning of all classes and functions
-    # It gives a description of the class or function
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
-    # replace the parse_url function in the class
-
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
@@ -33,9 +24,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             pass
         return (resource, pk)
 
-    # Here's a class function
     def _set_headers(self, status):
-        # Notice this Docstring also includes information about the arguments passed to the function
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
         headers on the response
 
@@ -47,7 +36,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
-    # Another method! This supports requests with the OPTIONS verb.
     def do_OPTIONS(self):
         """Sets the options headers
         """
@@ -59,24 +47,18 @@ class HandleRequests(BaseHTTPRequestHandler):
                          'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any GET request.
     def do_GET(self):
         """Handles GET requests to the server
         """
-        # Set the response code to 'Ok'
+
         self._set_headers(200)
         response = {}
-
-        # Your new console.log() that outputs to the terminal
-        # print(self.path)
 
         parsed = self.parse_url(self.path)
 
         if '?' not in self.path:
             (resource, id) = parsed
 
-            # It's an if..else statement
             if resource == "animals":
                 if id is not None:
                     response = get_single_animal(id)
@@ -143,23 +125,10 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Initialize new animal
         new_entity = None
 
-        # Add a new animal to the list. Don't worry about
-        # the orange squiggle, you'll define the create_animal
-        # function next.
         if resource == "animals":
             new_entity = create_animal(post_body)
-        # if resource == "locations":
-        #     new_entity = create_location(post_body)
-        # # if resource == "customers":
-        # #     new_entity = create_customer(post_body)
-        # if resource == "employees":
-        #     new_entity = create_employee(post_body)
 
-        # Encode the new animal and send in response
         self.wfile.write(json.dumps(new_entity).encode())
-
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any PUT request.
 
     def do_PUT(self):
         self._set_headers(204)
@@ -167,21 +136,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 
-        # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
         success = False
 
-        # Delete a single animal from the list
         if resource == "animals":
             success = update_animal(id, post_body)
-        # if resource == "locations":
-        #     update_location(id, post_body)
-        # # if resource == "customers":
-        # #     update_customer(id, post_body)
-        # if resource == "employees":
-        #     update_employee(id, post_body)
-        # Encode the new animal and send in response
 
         if success:
             self._set_headers(204)
@@ -191,27 +151,18 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write("".encode())
 
     def do_DELETE(self):
-        # Set a 204 response code
         self._set_headers(204)
 
-        # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Delete a single animal from the list
         if resource == "animals":
             delete_animal(id)
-        # if resource == "locations":
-        #     delete_location(id)
-        # if resource == "customers":
-        #     delete_customer(id)
         if resource == "employees":
             delete_employee(id)
-        # Encode the new animal and send in response
+        
         self.wfile.write("".encode())
 
 
-# This function is not inside the class. It is the starting
-# point of this application.
 def main():
     """Starts the server on port 8088 using the HandleRequests class
     """
