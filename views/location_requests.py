@@ -1,5 +1,4 @@
 import sqlite3
-import json
 from models import Location, Employee, Animal, Customer
 
 def get_all_locations():
