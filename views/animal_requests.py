@@ -61,7 +61,6 @@ def get_all_animals():
 
     return animals
 
-# Function with a single parameter
 def get_single_animal(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
