@@ -2,7 +2,7 @@ class Location():
     """This is the 
     """
 
-    def __init__(self, id, address):
+    def __init__(self, id, address, name):
         """_summary_
 
         Args:
@@ -10,4 +10,7 @@ class Location():
             address (_type_): _description_
         """
         self.id = id
+        self.name = name
         self.address = address
+        self.employees = []
+        self.animals = []
